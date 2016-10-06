@@ -61,6 +61,8 @@ type Client struct {
 // the ACME directory located at caDirURL for the rest of its actions. It will
 // generate private keys for certificates of size keyBits.
 func NewClient(caDirURL string, user User, keyType KeyType) (*Client, error) {
+	logf("XXXXXXX caDirURL = %v", caDirURL)
+
 	privKey := user.GetPrivateKey()
 	if privKey == nil {
 		return nil, errors.New("private key was nil")
@@ -83,6 +85,8 @@ func NewClient(caDirURL string, user User, keyType KeyType) (*Client, error) {
 	if dir.RevokeCertURL == "" {
 		return nil, errors.New("directory missing revoke certificate URL")
 	}
+
+	logf("XXXXXXX directory = %v", dir)
 
 	jws := &jws{privKey: privKey, directoryURL: caDirURL}
 
@@ -165,6 +169,9 @@ func (c *Client) Register() (*RegistrationResource, error) {
 	} else {
 		regMsg.Contact = []string{}
 	}
+
+	logf("XXXXXX INFO: at registration time, directory: %v", c.directory)
+	logf("XXXXXX INFO: registering to %v", c.directory.NewRegURL)
 
 	var serverReg Registration
 	hdr, err := postJSON(c.jws, c.directory.NewRegURL, regMsg, &serverReg)
@@ -405,6 +412,8 @@ func (c *Client) chooseSolvers(auth authorization, domain string) map[int]solver
 // Get the challenges needed to proof our identifier to the ACME server.
 func (c *Client) getChallenges(domains []string) ([]authorizationResource, map[string]error) {
 	resc, errc := make(chan authorizationResource), make(chan domainError)
+
+	logf("XXXXXXX [INFO][%s] acme: registration: %v", strings.Join(domains, ","), c.user.GetRegistration())
 
 	for _, domain := range domains {
 		go func(domain string) {

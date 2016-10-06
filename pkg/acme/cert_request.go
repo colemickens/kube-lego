@@ -24,10 +24,14 @@ func (a *Acme) client() (*acme.Client, error) {
 
 	err := a.getUser()
 	if err != nil {
+		a.Log().Infof("XXXXXXXX: creating user")
+
 		err := a.createUser()
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		a.Log().Infof("XXXXXXXX: skip user creation")
 	}
 
 	acmeClient, err := acme.NewClient(legoURL, a, kubelego.AcmeKeyType)

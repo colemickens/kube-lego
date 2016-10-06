@@ -33,6 +33,8 @@ func (a *Acme) createUser() error {
 	}
 	a.privateKey = privateKey
 
+	fmt.Println("XXXXXXXX: LegoURL: %v", a.kubelego.LegoURL())
+	a.Log().Infof("XXXXXXXXX: LegoURL: %v", a.kubelego.LegoURL())
 	legoClient, err := acme.NewClient(a.kubelego.LegoURL(), a, kubelego.AcmeKeyType)
 	if err != nil {
 		return err
