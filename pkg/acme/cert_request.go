@@ -19,7 +19,7 @@ func (a *Acme) client() (*acme.Client, error) {
 		return a.acmeClient, nil
 	}
 
-	legoURL = a.kubelego.LegoURL()
+	legoURL := a.kubelego.LegoURL()
 	a.Log().Infof("initializing lego acme connection to: ", legoURL)
 
 	err := a.getUser()

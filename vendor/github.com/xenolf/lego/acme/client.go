@@ -311,6 +311,7 @@ func (c *Client) RenewCertificate(cert CertificateResource, bundle bool) (Certif
 			// The issuer certificate link is always supplied via an "up" link
 			// in the response headers of a new certificate.
 			links := parseLinks(resp.Header["Link"])
+			logf("[INFO][%s] acme: links: %v", cert.Domain, links)
 			issuerCert, err := c.getIssuerCertificate(links["up"])
 			if err != nil {
 				// If we fail to acquire the issuer cert, return the issued certificate - do not fail.
@@ -478,6 +479,7 @@ func (c *Client) requestCertificate(authz []authorizationResource, bundle bool, 
 		return CertificateResource{}, err
 	}
 
+	logf("XXXXXXX [INFO][%s] acme: new cert URL: %v", commonName.Domain, commonName.NewCertURL)
 	resp, err := c.jws.post(commonName.NewCertURL, jsonBytes)
 	if err != nil {
 		return CertificateResource{}, err
@@ -488,6 +490,8 @@ func (c *Client) requestCertificate(authz []authorizationResource, bundle bool, 
 		Domain:     commonName.Domain,
 		CertURL:    resp.Header.Get("Location"),
 		PrivateKey: privateKeyPem}
+
+	logf("XXXXXXX [INFO][%s] acme: Location header from first request: %v", commonName.Domain, resp.Header.Get("Location"))
 
 	for {
 		switch resp.StatusCode {
@@ -513,6 +517,7 @@ func (c *Client) requestCertificate(authz []authorizationResource, bundle bool, 
 					// The issuer certificate link is always supplied via an "up" link
 					// in the response headers of a new certificate.
 					links := parseLinks(resp.Header["Link"])
+					logf("XXXXXXX [INFO][%s] acme: links: %v", commonName.Domain, links)
 					issuerCert, err := c.getIssuerCertificate(links["up"])
 					if err != nil {
 						// If we fail to acquire the issuer cert, return the issued certificate - do not fail.
