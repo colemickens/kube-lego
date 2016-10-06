@@ -222,11 +222,15 @@ func (c *Client) ObtainCertificate(domains []string, bundle bool, privKey crypto
 		return CertificateResource{}, failures
 	}
 
+	logf("XXXXXXXXXXXX[INFO][%s] challenges(before solve): %v", strings.Join(domains, ", "), challenges)
+
 	errs := c.solveChallenges(challenges)
 	// If any challenge fails - return. Do not generate partial SAN certificates.
 	if len(errs) > 0 {
 		return CertificateResource{}, errs
 	}
+
+	logf("XXXXXXXXXXXX[INFO][%s] challenges(after solve): %v", strings.Join(domains, ", "), challenges)
 
 	logf("[INFO][%s] acme: Validations succeeded; requesting certificates", strings.Join(domains, ", "))
 
